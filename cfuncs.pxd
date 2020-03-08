@@ -1,2 +1,2 @@
 cdef extern from "cfunc.h":
-   void cfunc(float *tempx, float *tempy)
+   void cfunc(unsigned char *tempx, unsigned char *tempy, int ch, int ih, int iw, int oh, int ow)

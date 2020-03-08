@@ -1,23 +1,29 @@
 #include<stdio.h>
 #include"cfunc.h"
 
-void cfunc(float *tempx, float *tempy){
+void cfunc(unsigned char *tempx, unsigned char *tempy, int ch, int ih, int iw, int oh, int ow){
 	int idx,c,n,m;
-	for(idx=0,c=0,n=0,m=0; idx<CH*OUTH*OUTW; idx++,m++){
-		if(m==OUTW){ m=0; n++; }
-		if(n==OUTH){ n=0; c++; }
-		const int m0=m*(INW-1)/(OUTW-1); int m1=m0+1;
-		const int n0=n*(INW-1)/(OUTW-1); int n1=n0+1;
-		const float dm=(float)(m)*(INW-1)/(OUTW-1)-m0;
-		const float dn=(float)(n)*(INW-1)/(OUTW-1)-n0;
-		if(m1==INW) m1=INW-1;
-		if(n1==INH) n1=INH-1;
 
-		tempy[n*CH*OUTW+c*OUTW+m]
-			= tempx[n1*CH*INW+c*INW+m1] *dm*dn
-			+ tempx[n0*CH*INW+c*INW+m1] *dm*(1-dn)
-			+ tempx[n1*CH*INW+c*INW+m0] *(1-dm)*dn
-			+ tempx[n0*CH*INW+c*INW+m0] *(1-dm)*(1-dn);
+	for(c=0; c<ch; c++){
+	for(n=0; n<oh; n++){
+	for(m=0; m<ow; m++){
+		unsigned short mm=m*(iw-1);
+		unsigned short nn=n*(ih-1);
+		unsigned char m0=mm/(ow-1); unsigned char m1=m0+1;
+		unsigned char n0=nn/(oh-1); unsigned char n1=n0+1;
+		unsigned short dm=mm-m0*(ow-1);
+		unsigned short dn=nn-n0*(oh-1);
+		if(m1==iw) m1=iw-1;
+		if(n1==ih) n1=ih-1;
+
+		unsigned int val =
+			  tempx[c*iw*ih + n1*iw + m1] *dm*dn
+			+ tempx[c*iw*ih + n0*iw + m1] *dm*(oh-1-dn)
+			+ tempx[c*iw*ih + n1*iw + m0] *(ow-1-dm)*dn
+			+ tempx[c*iw*ih + n0*iw + m0] *(ow-1-dm)*(oh-1-dn);
+		tempy[c*ow*oh + n*ow + m] = val/(ow-1)/(oh-1);
+	}
+	}
 	}
 }
 
